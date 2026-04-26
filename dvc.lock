@@ -1,0 +1,88 @@
+schema: '2.0'
+stages:
+  preprocess:
+    cmd: python main.py preprocess
+    deps:
+    - path: data/raw/movielens/
+      hash: md5
+      md5: 272b4c1841288d0b650899c2b3926fe8.dir
+      size: 30822933
+      nfiles: 6
+    - path: params.yaml
+      hash: md5
+      md5: 243eeba455f90ad3791a3dfd904e9684
+      size: 471
+    - path: src/data/download.py
+      hash: md5
+      md5: 1a9d0ccc47d7c03e02e1c8dd8b6cd02e
+      size: 1944
+    - path: src/data/movielens.py
+      hash: md5
+      md5: c68e4f48fc4d253c73106db297b3d05c
+      size: 6066
+    outs:
+    - path: data/processed/encoders.pkl
+      hash: md5
+      md5: 511945bc9be6d357db59518e5454775a
+      size: 39298
+    - path: data/processed/movies.parquet
+      hash: md5
+      md5: b86564d8069066e0093cd2b5742d742e
+      size: 99358
+    - path: data/processed/test.parquet
+      hash: md5
+      md5: 9189d4a7a4782d308741fb4ef8eb7885
+      size: 591486
+    - path: data/processed/train.parquet
+      hash: md5
+      md5: ea5e182dadaf69d1e8fe7abf9b1a9143
+      size: 4365981
+    - path: data/processed/val.parquet
+      hash: md5
+      md5: 9b9397032ad52cbb15954801c6234878
+      size: 167192
+  featurize:
+    cmd: python main.py featurize
+    deps:
+    - path: data/processed/test.parquet
+      hash: md5
+      md5: 9189d4a7a4782d308741fb4ef8eb7885
+      size: 591486
+    - path: data/processed/train.parquet
+      hash: md5
+      md5: ea5e182dadaf69d1e8fe7abf9b1a9143
+      size: 4365981
+    - path: data/processed/val.parquet
+      hash: md5
+      md5: 9b9397032ad52cbb15954801c6234878
+      size: 167192
+    - path: params.yaml
+      hash: md5
+      md5: 243eeba455f90ad3791a3dfd904e9684
+      size: 471
+    - path: src/data/features/
+      hash: md5
+      md5: 774adef0f6de7b08d02ec6fd2598bd9f.dir
+      size: 32050
+      nfiles: 14
+    outs:
+    - path: data/features/context_stats.json
+      hash: md5
+      md5: f5feff4109cb021f71cfcea82a917131
+      size: 661
+    - path: data/features/session_scaler.pkl
+      hash: md5
+      md5: 984ec7b59267ef16f6e403e6822f843a
+      size: 504
+    - path: data/features/test.parquet
+      hash: md5
+      md5: c08e04e031b3979fb60c2914fc5f03a0
+      size: 13124752
+    - path: data/features/train.parquet
+      hash: md5
+      md5: 2a9f9c5d33599f347d241a2a1f238d23
+      size: 8107011
+    - path: data/features/val.parquet
+      hash: md5
+      md5: 293f20a41bd17376757465fd5a611892
+      size: 3893583

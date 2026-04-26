@@ -1,0 +1,28 @@
+stages:
+  preprocess:
+    cmd: python main.py preprocess
+    deps:
+      - src/data/movielens.py
+      - src/data/download.py
+      - data/raw/movielens/
+      - params.yaml
+    outs:
+      - data/processed/train.parquet
+      - data/processed/val.parquet
+      - data/processed/test.parquet
+      - data/processed/encoders.pkl
+      - data/processed/movies.parquet
+  featurize:
+    cmd: python main.py featurize
+    deps:
+      - src/data/features/
+      - data/processed/train.parquet
+      - data/processed/val.parquet
+      - data/processed/test.parquet
+      - params.yaml
+    outs:
+      - data/features/train.parquet
+      - data/features/val.parquet
+      - data/features/test.parquet
+      - data/features/session_scaler.pkl
+      - data/features/context_stats.json
