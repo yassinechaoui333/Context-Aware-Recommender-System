@@ -1,6 +1,9 @@
 .venv/
 __pycache__/
 *.pyc
-outputs/
-data/
 .env
+data/raw/
+*.onnx
+wandb/
+outputs/logs/mlruns/
+outputs/checkpoints/

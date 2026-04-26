@@ -1,0 +1,22 @@
+data:
+  seed: 42
+  movielens_version: "1m" # "100k" for smoke tests
+  session_gap_seconds: 3600 # 1-hour gap = new session
+  negative_samples_train: 4
+  negative_samples_eval: 99
+  test_split_ratio: 0.1
+  val_split_ratio: 0.1
+  min_user_interactions: 5 # drop users with fewer ratings
+
+model:
+  embedding_dim: 64
+  mlp_layers: [128, 64, 32]
+  dropout: 0.2
+  lr: 0.001
+  weight_decay: 0.0001
+  batch_size: 256
+  max_epochs: 50
+  patience: 5
+
+eval:
+  k_values: [5, 10, 20]
