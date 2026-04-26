@@ -1,0 +1,6 @@
+outs:
+- md5: 272b4c1841288d0b650899c2b3926fe8.dir
+  size: 30822933
+  nfiles: 6
+  hash: md5
+  path: movielens
