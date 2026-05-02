@@ -1,0 +1,6 @@
+experiment_name: ablation_no_session
+model:
+  type: ContextNCFAttn
+  context_dim: 9
+ablation:
+  zeroed_cols: [session_pos_norm, session_len_norm]

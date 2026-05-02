@@ -1,0 +1,6 @@
+experiment_name: ablation_no_temporal
+model:
+  type: ContextNCFAttn
+  context_dim: 9
+ablation:
+  zeroed_cols: [sin_hour, cos_hour, sin_dow, cos_dow]
