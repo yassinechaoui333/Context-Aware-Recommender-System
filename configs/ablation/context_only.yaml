@@ -1,0 +1,9 @@
+experiment_name: ablation_context_only
+model:
+  type: ContextNCFAttn
+  context_dim: 9
+ablation:
+  # Zeroing user/item embeddings is handled in AblationDataModule by setting
+  # embedding outputs to zero after lookup (see ablation runner).
+  zeroed_cols: []
+  zero_embeddings: true

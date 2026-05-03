@@ -1,0 +1,4 @@
+experiment_name: ncf_baseline
+model:
+  type: NCF
+  context_dim: null

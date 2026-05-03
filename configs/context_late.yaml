@@ -1,0 +1,4 @@
+experiment_name: context_ncf_late
+model:
+  type: ContextNCFLate
+  context_dim: 9

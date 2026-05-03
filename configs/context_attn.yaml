@@ -1,0 +1,4 @@
+experiment_name: context_ncf_attn
+model:
+  type: ContextNCFAttn
+  context_dim: 9
