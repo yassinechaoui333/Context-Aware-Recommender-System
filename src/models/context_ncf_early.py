@@ -12,9 +12,9 @@ import torch
 import torch.nn as nn
 from torch import Tensor
 
-from src.models.ncf import NCF
 from src.models.modules.gmf import GMFBranch
 from src.models.modules.mlp import MLPBranch
+from src.models.ncf import NCF
 
 
 class ContextNCFEarly(NCF):

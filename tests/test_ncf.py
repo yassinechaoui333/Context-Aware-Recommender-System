@@ -1,11 +1,10 @@
 """Tests for NCF baseline model — Step 4.2."""
 from __future__ import annotations
 
-import torch
 import pytest
+import torch
 
 from src.models.ncf import NCF
-
 
 # ── fixtures ──────────────────────────────────────────────────────────────────
 

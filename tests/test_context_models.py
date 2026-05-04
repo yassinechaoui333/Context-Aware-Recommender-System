@@ -1,12 +1,12 @@
 """Tests for all three context model variants — Step 4.5."""
 from __future__ import annotations
 
-import torch
 import pytest
+import torch
 
-from src.models.context_ncf_late import ContextNCFLate
-from src.models.context_ncf_early import ContextNCFEarly
 from src.models.context_ncf_attn import ContextNCFAttn
+from src.models.context_ncf_early import ContextNCFEarly
+from src.models.context_ncf_late import ContextNCFLate
 
 # ── constants ─────────────────────────────────────────────────────────────────
 
@@ -65,7 +65,8 @@ def test_output_shape(model_fixture, request) -> None:
     model = request.getfixturevalue(model_fixture)
     users, items, context = _rand_inputs()
     out = model(users, items, context)
-    assert out.shape == (BATCH, 1), f"{model.__class__.__name__}: expected ({BATCH},1), got {out.shape}"
+    msg = f"{model.__class__.__name__}: expected ({BATCH},1), got {out.shape}"
+    assert out.shape == (BATCH, 1), msg
 
 
 @pytest.mark.parametrize("model_fixture", ["late_model", "early_model", "attn_model"])

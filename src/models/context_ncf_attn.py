@@ -11,8 +11,8 @@ from typing import List, Optional
 import torch
 from torch import Tensor
 
-from src.models.ncf import NCF
 from src.models.modules.gate import ContextGate
+from src.models.ncf import NCF
 
 
 class ContextNCFAttn(NCF):
