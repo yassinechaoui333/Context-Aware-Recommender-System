@@ -7,24 +7,21 @@ as ``from src.training.train import train; train("configs/ncf.yaml")``.
 """
 from __future__ import annotations
 
-import os
 from pathlib import Path
 from typing import Optional
 
-import mlflow
 import pytorch_lightning as pl
 from dotenv import load_dotenv
 from omegaconf import OmegaConf
 from pytorch_lightning.callbacks import EarlyStopping, ModelCheckpoint
 
+from src.models.context_ncf_attn import ContextNCFAttn
+from src.models.context_ncf_early import ContextNCFEarly
+from src.models.context_ncf_late import ContextNCFLate
+from src.models.ncf import NCF
+
 # Load env vars (.env file may define MLFLOW_TRACKING_URI etc.)
 load_dotenv()
-
-# Model registry — maps config type strings to classes
-from src.models.ncf import NCF
-from src.models.context_ncf_late import ContextNCFLate
-from src.models.context_ncf_early import ContextNCFEarly
-from src.models.context_ncf_attn import ContextNCFAttn
 
 MODEL_REGISTRY: dict = {
     "NCF": NCF,
@@ -54,18 +51,15 @@ def train(config_path: str, smoke_test: bool = False) -> None:
     model_type: str = cfg.model.type
     context_dim: Optional[int] = cfg.model.get("context_dim", None)
 
-    # ── 2. MLflow tracking ─────────────────────────────────────────────────
-    tracking_uri = os.environ.get(
-        "MLFLOW_TRACKING_URI", "outputs/logs/mlruns"
-    )
-    mlflow.set_tracking_uri(tracking_uri)
-    mlflow.set_experiment("context-recsys")
+    # ── 2. Experiment logger ───────────────────────────────────────────────
+    from src.training.logger import ExperimentLogger
 
-    with mlflow.start_run(run_name=experiment_name):
-        flat_params = OmegaConf.to_container(cfg, resolve=True)
-        mlflow.log_params(_flatten(flat_params))
+    logger = ExperimentLogger(cfg)
+    flat_params = OmegaConf.to_container(cfg, resolve=True)
+    logger.log_params(flat_params)
 
-        # ── 3. DataModule ──────────────────────────────────────────────────
+    try:
+        # ── 3. DataModule ────────────────────────────────────────────────
         ablation_cfg = cfg.get("ablation", None)
 
         if ablation_cfg is not None:
@@ -87,7 +81,7 @@ def train(config_path: str, smoke_test: bool = False) -> None:
         if smoke_test:
             datamodule = _wrap_smoke(datamodule)
 
-        # ── 4. Instantiate model ───────────────────────────────────────────
+        # ── 4. Instantiate model ─────────────────────────────────────────
         if model_type not in MODEL_REGISTRY:
             raise ValueError(
                 f"Unknown model type '{model_type}'. "
@@ -108,7 +102,7 @@ def train(config_path: str, smoke_test: bool = False) -> None:
             model_kwargs["context_dim"] = int(context_dim)
         model = model_cls(**model_kwargs)
 
-        # ── 5. Callbacks ───────────────────────────────────────────────────
+        # ── 5. Callbacks ─────────────────────────────────────────────────
         ckpt_dir = Path(f"outputs/checkpoints/{experiment_name}")
         ckpt_dir.mkdir(parents=True, exist_ok=True)
 
@@ -127,7 +121,7 @@ def train(config_path: str, smoke_test: bool = False) -> None:
             ),
         ]
 
-        # ── 6. Trainer ─────────────────────────────────────────────────────
+        # ── 6. Trainer ───────────────────────────────────────────────────
         max_epochs = 1 if smoke_test else int(cfg.model.max_epochs)
         trainer = pl.Trainer(
             max_epochs=max_epochs,
@@ -136,29 +130,19 @@ def train(config_path: str, smoke_test: bool = False) -> None:
             log_every_n_steps=10,
         )
 
-        # ── 7. Fit + test ──────────────────────────────────────────────────
+        # ── 7. Fit + test ────────────────────────────────────────────────
         trainer.fit(model, datamodule)
         trainer.test(model, datamodule)
 
-        # ── 8. Log checkpoint artifact ─────────────────────────────────────
+        # ── 8. Log checkpoint artifact ───────────────────────────────────
         best_ckpt = ckpt_dir / "best.ckpt"
         if best_ckpt.exists():
-            mlflow.log_artifact(str(best_ckpt))
+            logger.log_artifact(str(best_ckpt))
+    finally:
+        logger.end()
 
 
 # ── Helpers ────────────────────────────────────────────────────────────────────
-
-
-def _flatten(d: dict, prefix: str = "") -> dict:
-    """Recursively flatten a nested dict for MLflow log_params."""
-    out: dict = {}
-    for k, v in d.items():
-        key = f"{prefix}.{k}" if prefix else k
-        if isinstance(v, dict):
-            out.update(_flatten(v, key))
-        else:
-            out[key] = v
-    return out
 
 
 def _wrap_smoke(datamodule):
