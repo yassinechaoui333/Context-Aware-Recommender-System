@@ -10,12 +10,14 @@ mlflow
 dvc
 wandb
 fastapi
-uvicorn
+uvicorn[standard]
 redis
 gradio
 onnx
 onnxruntime
 pytest
+pytest-asyncio
+anyio[trio]
 httpx
 pydantic
 python-dotenv
@@ -25,3 +27,4 @@ matplotlib
 seaborn
 jupyterlab
 tabulate
+python-multipart
