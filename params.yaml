@@ -11,12 +11,12 @@ data:
 model:
   embedding_dim: 64
   mlp_layers: [128, 64, 32]
-  dropout: 0.2
+  dropout: 0.3
   lr: 0.001
   weight_decay: 0.0001
   batch_size: 256
   max_epochs: 50
-  patience: 5
+  patience: 15
 
 eval:
   k_values: [5, 10, 20]

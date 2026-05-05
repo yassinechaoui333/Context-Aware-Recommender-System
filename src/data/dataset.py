@@ -36,10 +36,15 @@ class RecSysDataset(Dataset):
         ctx = torch.tensor(ctx_np, dtype=torch.float32)
 
         if self.mode == "train":
+            negs = row["item_neg"]
+            if isinstance(negs, (list, np.ndarray)):
+                negs_t = torch.tensor(negs, dtype=torch.long)
+            else:
+                negs_t = torch.tensor(int(negs), dtype=torch.long)
             return {
                 "user": torch.tensor(int(row["user_id"]), dtype=torch.long),
                 "item_pos": torch.tensor(int(row["item_id"]), dtype=torch.long),
-                "item_neg": torch.tensor(int(row["item_neg"]), dtype=torch.long),
+                "item_neg": negs_t,
                 "context": ctx,
             }
 

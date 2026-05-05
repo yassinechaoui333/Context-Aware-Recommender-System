@@ -15,7 +15,6 @@ import pytest
 import torch
 from httpx import ASGITransport, AsyncClient
 
-
 # ---------------------------------------------------------------------------
 # Fixtures — patch heavy startup so tests are fast / offline
 # ---------------------------------------------------------------------------

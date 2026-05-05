@@ -97,7 +97,10 @@ def test_train_negatives_never_overlap_user_positives() -> None:
 
     assert "item_neg" in sampled.columns
     for _, row in sampled.iterrows():
-        assert int(row["item_neg"]) not in user_items[int(row["user_id"])]
+        negs = row["item_neg"]
+        assert isinstance(negs, list)
+        for neg_id in negs:
+            assert int(neg_id) not in user_items[int(row["user_id"])]
 
 
 def test_eval_negatives_have_positive_first_and_length_100() -> None:

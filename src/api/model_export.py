@@ -18,7 +18,6 @@ from pathlib import Path
 import numpy as np
 import torch
 
-
 OUTPUTS_DIR = Path("outputs")
 CKPT_PATH = OUTPUTS_DIR / "checkpoints" / "context_ncf_attn" / "best.ckpt"
 ENCODERS_PATH = Path("data/processed/encoders.pkl")

@@ -17,7 +17,7 @@ def _build_user_item_sets(df: pd.DataFrame) -> Dict[int, set[int]]:
 def sample_negatives_train(df: pd.DataFrame, n_neg: int = 4, seed: int = 42) -> pd.DataFrame:
     sampled = df.copy().reset_index(drop=True)
     if sampled.empty:
-        sampled["item_neg"] = np.array([], dtype=np.int64)
+        sampled["item_neg"] = []
         return sampled
 
     if n_neg <= 0:
@@ -31,7 +31,6 @@ def sample_negatives_train(df: pd.DataFrame, n_neg: int = 4, seed: int = 42) -> 
     pop_weights /= pop_weights.sum()
 
     rng = np.random.default_rng(seed)
-    negatives = np.empty(len(sampled), dtype=np.int64)
 
     user_candidate_items: dict[int, np.ndarray] = {}
     user_candidate_weights: dict[int, np.ndarray] = {}
@@ -47,7 +46,8 @@ def sample_negatives_train(df: pd.DataFrame, n_neg: int = 4, seed: int = 42) -> 
         user_candidate_items[int(user_id)] = candidate_items
         user_candidate_weights[int(user_id)] = candidate_weights
 
-    for idx, row in sampled.iterrows():
+    negatives_col: list[list[int]] = []
+    for _, row in sampled.iterrows():
         user_id = int(row["user_id"])
         candidate_items = user_candidate_items[user_id]
         candidate_weights = user_candidate_weights[user_id]
@@ -58,9 +58,9 @@ def sample_negatives_train(df: pd.DataFrame, n_neg: int = 4, seed: int = 42) -> 
             replace=True,
             p=candidate_weights,
         )
-        negatives[idx] = int(sampled_negs[0])
+        negatives_col.append(sampled_negs.astype(int).tolist())
 
-    sampled["item_neg"] = negatives
+    sampled["item_neg"] = negatives_col
     return sampled
 
 

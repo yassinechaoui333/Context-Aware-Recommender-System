@@ -14,7 +14,6 @@ from __future__ import annotations
 
 import pickle
 from pathlib import Path
-from typing import Optional
 
 import matplotlib
 import matplotlib.pyplot as plt

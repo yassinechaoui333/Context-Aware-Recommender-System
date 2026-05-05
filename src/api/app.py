@@ -21,7 +21,6 @@ import pickle
 import time
 from contextlib import asynccontextmanager
 from pathlib import Path
-from typing import Optional
 
 import numpy as np
 import pandas as pd

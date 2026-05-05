@@ -122,12 +122,23 @@ def train(config_path: str, smoke_test: bool = False) -> None:
         ]
 
         # ── 6. Trainer ───────────────────────────────────────────────────
+        import os
+
+        from pytorch_lightning.loggers import MLFlowLogger
+
+        mlf_logger = MLFlowLogger(
+            experiment_name="context-recsys",
+            tracking_uri=os.environ.get("MLFLOW_TRACKING_URI", "outputs/logs/mlruns"),
+            run_id=logger.run_id,
+        )
+
         max_epochs = 1 if smoke_test else int(cfg.model.max_epochs)
         trainer = pl.Trainer(
             max_epochs=max_epochs,
             callbacks=callbacks,
             enable_progress_bar=True,
             log_every_n_steps=10,
+            logger=mlf_logger,
         )
 
         # ── 7. Fit + test ────────────────────────────────────────────────

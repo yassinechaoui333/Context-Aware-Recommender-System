@@ -88,8 +88,8 @@ class NCF(pl.LightningModule):
     # ------------------------------------------------------------------
 
     def _init_weights(self) -> None:
-        nn.init.normal_(self.user_emb.weight, mean=0.0, std=0.01)
-        nn.init.normal_(self.item_emb.weight, mean=0.0, std=0.01)
+        nn.init.xavier_normal_(self.user_emb.weight)
+        nn.init.xavier_normal_(self.item_emb.weight)
         # Zero out the padding embedding
         with torch.no_grad():
             self.user_emb.weight[0].fill_(0.0)
@@ -168,9 +168,35 @@ class NCF(pl.LightningModule):
     # ------------------------------------------------------------------
 
     def training_step(self, batch: dict[str, Tensor], batch_idx: int) -> Tensor:  # noqa: ARG002
-        pos_score = self(batch["user"], batch["item_pos"], batch.get("context"))
-        neg_score = self(batch["user"], batch["item_neg"], batch.get("context"))
-        loss = self._bpr_loss(pos_score.squeeze(-1), neg_score.squeeze(-1))
+        user = batch["user"]
+        pos = batch["item_pos"]
+        neg = batch["item_neg"]
+        ctx = batch.get("context")
+
+        pos_score = self(user, pos, ctx).squeeze(-1)  # (B,)
+
+        if neg.ndim == 1:
+            neg_score = self(user, neg, ctx).squeeze(-1)
+            bpr_losses = -torch.log(torch.sigmoid(pos_score - neg_score) + 1e-8)
+            loss = bpr_losses.mean()
+        else:
+            B, n_neg = neg.shape
+            neg_flat = neg.reshape(-1)
+            user_exp = user.unsqueeze(1).expand(B, n_neg).reshape(-1)
+
+            if ctx is not None:
+                ctx_exp = ctx.unsqueeze(1).expand(B, n_neg, -1).reshape(B * n_neg, -1)
+            else:
+                ctx_exp = None
+
+            neg_score = self(
+                user_exp, neg_flat, ctx_exp
+            ).reshape(B, n_neg).squeeze(-1)
+            bpr_losses = -torch.log(torch.sigmoid(
+                pos_score.unsqueeze(1) - neg_score
+            ) + 1e-8)
+            loss = bpr_losses.mean()
+
         self.log("train_loss", loss, on_step=True, on_epoch=True, prog_bar=True)
         return loss
 
