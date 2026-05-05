@@ -63,7 +63,6 @@ async def client():
 # ---------------------------------------------------------------------------
 
 
-@pytest.mark.anyio
 async def test_health(client: AsyncClient) -> None:
     resp = await client.get("/health")
     assert resp.status_code == 200
@@ -72,7 +71,6 @@ async def test_health(client: AsyncClient) -> None:
     assert "model" in body
 
 
-@pytest.mark.anyio
 async def test_recommend_valid(client: AsyncClient) -> None:
     payload = {
         "user_id": 1,
@@ -95,7 +93,6 @@ async def test_recommend_valid(client: AsyncClient) -> None:
     assert "latency_ms" in body
 
 
-@pytest.mark.anyio
 async def test_recommend_default_k(client: AsyncClient) -> None:
     """k defaults to 10 when not supplied."""
     payload = {
@@ -113,7 +110,6 @@ async def test_recommend_default_k(client: AsyncClient) -> None:
     assert len(resp.json()["items"]) == 10
 
 
-@pytest.mark.anyio
 async def test_recommend_invalid_hour(client: AsyncClient) -> None:
     """hour=99 must fail with 422 Unprocessable Entity."""
     payload = {
@@ -131,7 +127,6 @@ async def test_recommend_invalid_hour(client: AsyncClient) -> None:
     assert resp.status_code == 422
 
 
-@pytest.mark.anyio
 async def test_recommend_invalid_device(client: AsyncClient) -> None:
     """device=5 must fail with 422."""
     payload = {
@@ -148,7 +143,6 @@ async def test_recommend_invalid_device(client: AsyncClient) -> None:
     assert resp.status_code == 422
 
 
-@pytest.mark.anyio
 async def test_get_item_found(client: AsyncClient) -> None:
     resp = await client.get("/items/1")
     assert resp.status_code == 200
@@ -157,13 +151,11 @@ async def test_get_item_found(client: AsyncClient) -> None:
     assert body["id"] == 1
 
 
-@pytest.mark.anyio
 async def test_get_item_not_found(client: AsyncClient) -> None:
     resp = await client.get("/items/999999")
     assert resp.status_code == 404
 
 
-@pytest.mark.anyio
 async def test_recommend_latency(client: AsyncClient) -> None:
     """End-to-end latency (mocked model) must be < 200 ms."""
     payload = {
